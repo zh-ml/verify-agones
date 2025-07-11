@@ -16,7 +16,9 @@ func main() {
 	hub := ws.NewHub()
 	go hub.Run()
 	clientset := k8s.NewK8sClient(cfg)
+	agonesClient := k8s.NewAgonesClient(cfg)
 	pc := controller.NewPodController(clientset, hub, cfg)
+	ac := controller.NewAgonesController(agonesClient, cfg)
 
 	api := router.Group("/api")
 	{
@@ -26,7 +28,9 @@ func main() {
 		api.DELETE("/pods/:name", pc.DeletePod)
 		api.GET("/ws/pods", controller.PodStatusWS)
 		api.GET("/watch/pods", controller.ServeWs(hub))
-
+		api.POST("/gs/allocate", ac.AllocateGameServer)
+		api.GET("/gs/listAllocated", ac.ListAllocatedGameServer)
+		api.DELETE("/gs/delete/:name", ac.DeleteGameServer)
 	}
 
 	router.Run(cfg.ServerPort) // e.g., ":8080"

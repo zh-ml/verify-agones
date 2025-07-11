@@ -17,7 +17,7 @@ func LoadConfig() *Config {
 		ServerPort: getEnv("SERVER_PORT", ":8080"),
 		KubeConfig: getEnv("KUBECONFIG", ""), // "/Users/kc-user/.kube/config"
 		JWTSecret:  getEnv("JWT_SECRET", "your-default-jwt-secret"),
-		Namespace:  getEnv("NAMESPACE", "kube-system"),
+		Namespace:  getEnv("NAMESPACE", "default"),
 	}
 
 	log.Printf("Loaded config: %+v\n", cfg)

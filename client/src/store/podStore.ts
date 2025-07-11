@@ -1,9 +1,10 @@
 import { create } from "zustand";
 import * as podApi from "../api/pod";
-import type { PodInfo } from "../api/pod";
+import type { GameServerInfo, PodInfo } from "../api/pod";
 
 interface PodStore {
   pods: PodInfo[];
+  allocatedGameServers: GameServerInfo[] | null;
   loading: boolean;
   error: string | null;
   fetchPods: () => Promise<void>;
@@ -11,12 +12,16 @@ interface PodStore {
   createPod: (name: string, image: string) => Promise<void>;
   deletePod: (name: string) => Promise<void>;
   updatePod: (pod: PodInfo) => void;
+  allocateGameServer: (name: string) => Promise<void>;
+  fetchAllocatedGameServers: () => Promise<void>;
+  deleteAllocatedGameServer: (name: string) => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
 }
 
 export const usePodStore = create<PodStore>((set) => ({
   pods: [],
+  allocatedGameServers: null,
   loading: false,
   error: null,
   
@@ -83,6 +88,46 @@ export const usePodStore = create<PodStore>((set) => ({
       pods: state.pods.map((p) => (p.name === pod.name ? pod : p)),
     }));
   },
+
+  allocateGameServer: async (name: string) => {
+    set({ loading: true, error: null });
+    try {
+      const gameServer = await podApi.allocateGameServer({ name });
+      set((state) => ({ pods: [...state.pods, gameServer], loading: false }));
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to allocate game server',
+        loading: false 
+      });
+    }
+  },
+
+  fetchAllocatedGameServers: async () => {
+    set({ loading: true, error: null });
+    try {
+      const gameServers = await podApi.listAllocatedGameServers();
+      set({ allocatedGameServers: gameServers || [], loading: false });
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to fetch game servers',
+        loading: false 
+      });
+    }
+  },
+
+  deleteAllocatedGameServer: async (name: string) => {
+    set({ loading: true, error: null });
+    try {
+      await podApi.deleteAllocatedGameServer(name);
+      set((state) => ({ allocatedGameServers: state.allocatedGameServers?.filter((gs) => gs.name !== name) || [], loading: false }));
+    } catch (error) {
+      set({ 
+        error: error instanceof Error ? error.message : 'Failed to delete game server',
+        loading: false 
+      });
+    }
+  },
+
 
   setLoading: (loading) => set({ loading }),
   setError: (error) => set({ error }),

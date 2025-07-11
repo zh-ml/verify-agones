@@ -1,11 +1,10 @@
-import PodForm from './components/PodForm';
-import PodList from './components/PodList';
+import GameServerAllocation from './components/GameServerAllocation';
+import GameServerListAllocated from './components/GameServerListAllocated';
+// import PodForm from './components/PodForm';
+// import PodList from './components/PodList';
 import { usePodWatchSocket } from './usePodSocket';
-// import { usePodStore } from './store/podStore';
 
 export default function App() {
-  // const { setError } = usePodStore();
-
   // 监听 Pod 事件，用于实时更新
   usePodWatchSocket((event) => {
     console.log('Pod event received:', event);
@@ -26,15 +25,17 @@ export default function App() {
         backgroundColor: '#f8f9fa',
         borderRadius: '8px'
       }}>
-        <h1 style={{ margin: '0', color: '#333' }}>Kubernetes Pod 管理系统</h1>
+        <h1 style={{ margin: '0', color: '#333' }}>Agones Game Server Allocation</h1>
         <p style={{ margin: '10px 0 0 0', color: '#666' }}>
-          创建、管理和监控 Kubernetes Pod
+          Allocate, manage and monitor Agones Game Server
         </p>
       </header>
       
       <main>
-        <PodForm />
-        <PodList />
+        <GameServerAllocation />
+        <GameServerListAllocated />
+        {/* <PodForm /> */}
+        {/* <PodList /> */}
       </main>
     </div>
   );

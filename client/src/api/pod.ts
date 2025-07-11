@@ -11,9 +11,20 @@ export interface PodInfo {
   status: string;
 }
 
+export interface GameServerInfo {
+  name: string;
+  ip?: string;
+  port?: number;
+  status: string;
+}
+
 export interface CreatePodRequest {
   name: string;
   image: string;
+}
+
+export interface AllocateGameServerRequest {
+  name: string;
 }
 
 export const createPod = (data: CreatePodRequest): Promise<PodInfo> =>
@@ -27,6 +38,15 @@ export const listPods = (): Promise<PodInfo[]> =>
 
 export const deletePod = (name: string): Promise<{ message: string }> =>
   api.delete(`/pods/${name}`).then((res) => res.data);
+
+export const allocateGameServer = (data: AllocateGameServerRequest): Promise<GameServerInfo> =>
+  api.post("/gs/allocate", data).then((res) => res.data);
+
+export const listAllocatedGameServers = (): Promise<GameServerInfo[]> =>
+  api.get("/gs/listAllocated").then((res) => res.data);
+
+export const deleteAllocatedGameServer = (name: string): Promise<{ message: string }> =>
+  api.delete(`/gs/delete/${name}`).then((res) => res.data);
 
 // WebSocket 连接方法
 export const createPodStatusWebSocket = (onMessage: (data: any) => void): WebSocket => {
