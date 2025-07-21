@@ -4,7 +4,7 @@ import type { GameServerInfo, PodInfo } from "../api/pod";
 
 interface PodStore {
   pods: PodInfo[];
-  allocatedGameServers: GameServerInfo[] | null;
+  allocatedGameServers: GameServerInfo[];
   loading: boolean;
   error: string | null;
   fetchPods: () => Promise<void>;
@@ -21,7 +21,7 @@ interface PodStore {
 
 export const usePodStore = create<PodStore>((set) => ({
   pods: [],
-  allocatedGameServers: null,
+  allocatedGameServers: [],
   loading: false,
   error: null,
   
@@ -93,7 +93,7 @@ export const usePodStore = create<PodStore>((set) => ({
     set({ loading: true, error: null });
     try {
       const gameServer = await podApi.allocateGameServer({ name });
-      set((state) => ({ pods: [...state.pods, gameServer], loading: false }));
+      set((state) => ({ allocatedGameServers: [...state.allocatedGameServers, gameServer], loading: false }));
     } catch (error) {
       set({ 
         error: error instanceof Error ? error.message : 'Failed to allocate game server',

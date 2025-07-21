@@ -1,10 +1,24 @@
 import GameServerAllocation from './components/GameServerAllocation';
 import GameServerListAllocated from './components/GameServerListAllocated';
-// import PodForm from './components/PodForm';
-// import PodList from './components/PodList';
 import { usePodWatchSocket } from './usePodSocket';
+import MainPage from './components/MainPage';
+import OrderPage from './components/OrderPage';
+import React from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import SelectPage from './components/SelectPage';
 
-export default function App() {
+// 示例数据
+const sampleList = [
+  { id: 0, image: '/minecraft.svg', webp: '/minecraft.webp', name: 'Minecraft Java', content: '¥ 20000 / month', isClick: 'true' },
+  { id: 1, image: '/vite.svg', webp: '/vite.svg', name: 'item1', content: 'item1', isClick: 'false' },
+  { id: 2, image: '/vite.svg', webp: '/vite.svg', name: 'item2', content: 'item2', isClick: 'false' },
+  { id: 3, image: '/vite.svg', webp: '/vite.svg', name: 'item3', content: 'item3', isClick: 'false' },
+  { id: 4, image: '/vite.svg', webp: '/vite.svg', name: 'item4', content: 'item4', isClick: 'false' },
+  { id: 5, image: '/vite.svg', webp: '/vite.svg', name: 'item5', content: 'item5', isClick: 'false' },
+];
+
+function MainApp() {
+  const navigate = useNavigate();
   // 监听 Pod 事件，用于实时更新
   usePodWatchSocket((event) => {
     console.log('Pod event received:', event);
@@ -25,18 +39,62 @@ export default function App() {
         backgroundColor: '#f8f9fa',
         borderRadius: '8px'
       }}>
-        <h1 style={{ margin: '0', color: '#333' }}>Agones Game Server Allocation</h1>
+        <h1 style={{ margin: '0', color: '#333' }}>Dedicated Game Server</h1>
         <p style={{ margin: '10px 0 0 0', color: '#666' }}>
-          Allocate, manage and monitor Agones Game Server
+          Choose which you want.
         </p>
+        <button
+          style={{
+            marginTop: '10px',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 700,
+            transition: 'background-color 0.3s',
+          }}
+          onClick={() => navigate('/info/')}
+        >
+          Console Page
+        </button>
       </header>
-      
       <main>
-        <GameServerAllocation />
-        <GameServerListAllocated />
-        {/* <PodForm /> */}
-        {/* <PodList /> */}
+        <Routes>
+          <Route path="/" element={<MainPage list={sampleList} />} />
+          <Route path="/info/" element={<GameServerListAllocated />} />
+          <Route path="/order/:id" element={<OrderPage />} />
+          <Route path="select/:id" element={<SelectPage />} />
+        </Routes>
       </main>
+      <div style={{
+      maxWidth: 1000,
+      margin: '20px auto',
+      background: '#000',
+      borderRadius: 12,
+      boxShadow: '0 2px 16px #0001',
+      padding: 24,
+      color: '#fff',
+      textAlign: 'center',
+      fontSize: '16px',
+      opacity: 0.7,
+    }}>
+      <p>
+        <strong>Note:</strong> This is a demo page. The server will be allocated for 1 hour and then automatically released.
+        <br />
+        If you want to keep it longer, please contact the administrator.
+      </p>
     </div>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <MainApp />
+    </BrowserRouter>
   );
 }
