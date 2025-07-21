@@ -15,3 +15,16 @@ go run cmd/main.go
 ```
 localhost:3000
 ```
+
+## web UI
+#### main page
+![alt text](mainpage.png)
+
+#### order page
+![alt text](orderpage.png)
+
+#### select page
+![alt text](selectpage.png)
+
+#### console page
+![alt text](consolepage.png)
