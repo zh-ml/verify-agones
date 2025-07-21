@@ -4,7 +4,7 @@ import { usePodWatchSocket } from './usePodSocket';
 import MainPage from './components/MainPage';
 import OrderPage from './components/OrderPage';
 import React from 'react';
-import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SelectPage from './components/SelectPage';
 
 // 示例数据
@@ -19,11 +19,12 @@ const sampleList = [
 
 function MainApp() {
   const navigate = useNavigate();
+  const location = useLocation();
   // 监听 Pod 事件，用于实时更新
-  usePodWatchSocket((event) => {
-    console.log('Pod event received:', event);
-    // 可以在这里处理特定的事件类型
-  });
+  // usePodWatchSocket((event) => {
+  //   console.log('Pod event received:', event);
+  //   // 可以在这里处理特定的事件类型
+  // });
 
   return (
     <div style={{ 
@@ -43,6 +44,7 @@ function MainApp() {
         <p style={{ margin: '10px 0 0 0', color: '#666' }}>
           Choose which you want.
         </p>
+        { location.pathname !== '/info/' && (
         <button
           style={{
             marginTop: '10px',
@@ -60,6 +62,7 @@ function MainApp() {
         >
           Console Page
         </button>
+        )}
       </header>
       <main>
         <Routes>
