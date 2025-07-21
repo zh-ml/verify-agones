@@ -109,7 +109,7 @@ function MainApp() {
           <Route path="/info/" element={<GameServerListAllocated />} />
           <Route path="/guide/" element={<GuidePage />} />
           <Route path="/order/:id" element={<OrderPage />} />
-          <Route path="select/:id" element={<SelectPage />} />
+          <Route path="/select/:id" element={<SelectPage />} />
         </Routes>
       </main>
       <div style={{
