@@ -15,7 +15,7 @@ go run cmd/main.go
 ```
 localhost:3000
 ```
-
+---
 ## web UI
 #### main page
 ![alt text](mainpage.png)
@@ -28,3 +28,6 @@ localhost:3000
 
 #### console page
 ![alt text](consolepage.png)
+
+#### guide page
+![alt text](guidepage.png)
