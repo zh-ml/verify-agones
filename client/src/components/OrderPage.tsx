@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import type { ItemData } from './MainPage';
 
 const plans = [
@@ -27,9 +27,7 @@ const orderFeatures = [
 ];
 
 export default function OrderPage() {
-  const { id } = useParams();
   const [planIdx, setPlanIdx] = useState(0);
-  const plan = plans[planIdx];
   const location = useLocation();
   const data = location.state as ItemData;
   const navigate = useNavigate();

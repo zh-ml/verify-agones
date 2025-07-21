@@ -6,6 +6,7 @@ import OrderPage from './components/OrderPage';
 import React from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SelectPage from './components/SelectPage';
+import GuidePage from './components/GuidePage';
 
 // 示例数据
 const sampleList = [
@@ -63,11 +64,50 @@ function MainApp() {
           Console Page
         </button>
         )}
+        { location.pathname === '/info/' && (
+        <div style={{ display: 'flex', justifyContent: 'center', marginTop: '10px', gap: '10px' }}>
+        <button
+          style={{
+            marginTop: '10px',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 700,
+            transition: 'background-color 0.3s',
+          }}
+          onClick={() => navigate('/')}
+        >
+          Main Page
+        </button>
+        <button
+          style={{
+            marginTop: '10px',
+            padding: '10px 20px',
+            backgroundColor: '#007bff',
+            color: '#fff',
+            border: 'none',
+            borderRadius: '5px',
+            cursor: 'pointer',
+            fontSize: '16px',
+            fontWeight: 700,
+            transition: 'background-color 0.3s',
+          }}
+          onClick={() => navigate('/guide/')}
+        >
+          Guide Page
+        </button>
+        </div>
+        )}
       </header>
       <main>
         <Routes>
           <Route path="/" element={<MainPage list={sampleList} />} />
           <Route path="/info/" element={<GameServerListAllocated />} />
+          <Route path="/guide/" element={<GuidePage />} />
           <Route path="/order/:id" element={<OrderPage />} />
           <Route path="select/:id" element={<SelectPage />} />
         </Routes>
