@@ -29,8 +29,9 @@ func main() {
 		api.GET("/ws/pods", controller.PodStatusWS)
 		api.GET("/watch/pods", controller.ServeWs(hub))
 		api.POST("/gs/allocate", ac.AllocateGameServer)
-		api.GET("/gs/listAllocated", ac.ListAllocatedGameServer)
+		api.POST("/gs/listGameServers", ac.ListGameServers)
 		api.DELETE("/gs/delete/:name", ac.DeleteGameServer)
+		api.POST("/gs/deployGameServer", ac.DeployGameServer)
 	}
 
 	router.Run(cfg.ServerPort) // e.g., ":8080"

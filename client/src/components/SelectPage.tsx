@@ -2,26 +2,28 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import type { ItemData } from './MainPage';
 import { usePodStore } from '../store/podStore';
-
-const allVersion = [
-    {id: 0, versions: ['1.21.7', '1.21.6', '1.21.5', '1.21.4']},
-]
+import { allVersion, cpuOptions, memoryOptions, GameServerState } from '../common/const';
+import { generateSixDigitNumber } from '../common/utils';
 
 export default function SelectPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const state = location.state as ItemData;
   const [selected, setSelected] = useState('1.21.4');
+  const [cpu, setCpu] = useState('1');
+  const [memory, setMemory] = useState('1');
+  // const [label, setLabel] = useState('');
 
-  const { allocateGameServer, fetchAllocatedGameServers, allocatedGameServers, loading, error } = usePodStore();
+  const { deployGameServer, fetchAllGameServers, allocatedGameServers, loading, error } = usePodStore();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!state.name.trim()) {
       return;
     }
-    await allocateGameServer(state?.name);
-    fetchAllocatedGameServers();
+    const label = state.name + '-' + generateSixDigitNumber();
+    await deployGameServer(state?.name, selected, cpu, memory, label);
+    await fetchAllGameServers(GameServerState.ALLOCATED);
     if (!loading && allocatedGameServers) {
       setTimeout(() => {
         navigate(`/info/`);
@@ -33,11 +35,9 @@ export default function SelectPage() {
     return <div style={{ padding: 40, textAlign: 'center', color: 'red' }}>No data provided.</div>;
   }
 
-  // window.confirm(JSON.stringify(allocatedGameServers));
-
   useEffect(() => {
     if (!allocatedGameServers || allocatedGameServers.length === 0) {
-      fetchAllocatedGameServers();
+      fetchAllGameServers(GameServerState.ALLOCATED);
     }
   }, []);
 
@@ -73,6 +73,30 @@ export default function SelectPage() {
                   {opt}
                 </option>
               ))}
+          </select>
+          {/* CPU 选择 */}
+          <select
+            value={cpu}
+            onChange={e => setCpu(e.target.value)}
+            style={{ fontSize: 18, padding: '8px 16px', borderRadius: 8, border: '1px solid #ccc', minWidth: 100, opacity: 0.7, marginRight: 12}}
+          >
+            {cpuOptions.map(opt => (
+              <option key={opt} value={opt}>
+                {opt} 核CPU
+              </option>
+            ))}
+          </select>
+          {/* 内存选择 */}
+          <select
+            value={memory}
+            onChange={e => setMemory(e.target.value)}
+            style={{ fontSize: 18, padding: '8px 16px', borderRadius: 8, border: '1px solid #ccc', minWidth: 100, opacity: 0.7}}
+          >
+            {memoryOptions.map(opt => (
+              <option key={opt} value={opt}>
+                {opt} GB内存
+              </option>
+            ))}
           </select>
         </div>
         <form onSubmit={handleSubmit}>

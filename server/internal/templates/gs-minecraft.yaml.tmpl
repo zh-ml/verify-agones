@@ -1,0 +1,62 @@
+apiVersion: 'agones.dev/v1'
+kind: GameServer
+metadata:
+  labels:
+    game: {{.Label}}
+  annotations:
+    external-dns.alpha.kubernetes.io/hostname: {{.Hostname}}
+    external-dns.alpha.kubernetes.io/gameserver-service: {{.ServiceName}}
+  generateName: '{{.GenerateName}}-'
+spec:
+  container: {{.GameServerBaseTemplateVars.ContainerName}}
+  ports:
+    - name: {{.PortName}}
+      portPolicy: {{.PortPolicy}}
+      container: {{.GameServerBaseTemplateVars.ContainerName}}
+      containerPort: 25565
+      protocol: {{.Protocol}}
+  health:
+    initialDelaySeconds: {{.HealthInitialDelay}}
+    periodSeconds: {{.HealthPeriod}}
+    failureThreshold: {{.HealthFailure}}
+  template:
+    spec:
+      containers:
+        - name: {{.GameServerBaseTemplateVars.ContainerName}}
+          image: {{.GameServerBaseTemplateVars.Image}}
+          env:
+            - name: EULA
+              value: "{{.EULA}}"
+            - name: VERSION
+              value: "{{.Version}}"
+            - name: ONLINE_MODE
+              value: "{{.OnlineMode}}"
+          volumeMounts:
+            - mountPath: /data
+              name: world-vol
+          ports:
+            - containerPort: 25575
+          resources:
+            requests:
+              cpu: {{.CpuResource}}
+              memory: {{.MemoryResource}}Gi
+            limits:
+              cpu: {{.CpuResource}}
+              memory: {{.MemoryResource}}Gi
+        - name: mc-monitor
+          image: saulmaldonado/agones-mc
+          args:
+            - monitor
+          env:
+            - name: INITIAL_DELAY
+              value: "30s"
+            - name: MAX_ATTEMPTS
+              value: "5"
+            - name: INTERVAL
+              value: "10s"
+            - name: TIMEOUT
+              value: "10s"
+          imagePullPolicy: Always
+      volumes:
+        - name: world-vol
+          emptyDir: {}

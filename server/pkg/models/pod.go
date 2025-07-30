@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type PodInfo struct {
 	Name   string  `json:"name"`
 	IP     string  `json:"ip,omitempty"`
@@ -8,8 +10,9 @@ type PodInfo struct {
 }
 
 type GameServerInfo struct {
-	Name   string  `json:"name"`
-	IP     string  `json:"ip,omitempty"`
-	Port   int32 `json:"port,omitempty"`
-	Status string  `json:"status,omitempty"`
+	Name      string    `json:"name"`
+	IP        string    `json:"ip,omitempty"`
+	Port      int32     `json:"port,omitempty"`
+	Status    string    `json:"status,omitempty"`
+	StartTime time.Time `json:"startTime,omitempty"`
 }

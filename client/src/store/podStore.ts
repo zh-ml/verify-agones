@@ -13,7 +13,8 @@ interface PodStore {
   deletePod: (name: string) => Promise<void>;
   updatePod: (pod: PodInfo) => void;
   allocateGameServer: (name: string) => Promise<void>;
-  fetchAllocatedGameServers: () => Promise<void>;
+  deployGameServer: (name: string, version: string, cpuResource: string, memoryResource: string, label: string) => Promise<void>;
+  fetchAllGameServers: (status: string) => Promise<void>;
   deleteAllocatedGameServer: (name: string) => Promise<void>;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
@@ -102,10 +103,24 @@ export const usePodStore = create<PodStore>((set) => ({
     }
   },
 
-  fetchAllocatedGameServers: async () => {
+  deployGameServer: async (name: string, version: string, cpuResource: string, memoryResource: string, label: string) => {
     set({ loading: true, error: null });
     try {
-      const gameServers = await podApi.listAllocatedGameServers();
+      // fixme: 异步不等待
+      podApi.deployGameServer({ name, version, cpuResource, memoryResource, label });
+      set({loading: false });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'Failed to allocate game server',
+        loading: false
+      });
+    }
+  },
+
+  fetchAllGameServers: async (status: string) => {
+    set({ loading: false, error: null });
+    try {
+      const gameServers = await podApi.listGameServers({ status });
       set({ allocatedGameServers: gameServers || [], loading: false });
     } catch (error) {
       set({ 

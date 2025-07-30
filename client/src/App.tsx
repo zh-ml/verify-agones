@@ -1,22 +1,12 @@
-import GameServerAllocation from './components/GameServerAllocation';
 import GameServerListAllocated from './components/GameServerListAllocated';
-import { usePodWatchSocket } from './usePodSocket';
 import MainPage from './components/MainPage';
 import OrderPage from './components/OrderPage';
 import React from 'react';
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import SelectPage from './components/SelectPage';
 import GuidePage from './components/GuidePage';
+import { sampleList } from './common/const';
 
-// 示例数据
-const sampleList = [
-  { id: 0, image: '/minecraft.svg', webp: '/minecraft.webp', name: 'Minecraft Java', content: '¥ 20000 / month', isClick: 'true' },
-  { id: 1, image: '/vite.svg', webp: '/vite.svg', name: 'item1', content: 'item1', isClick: 'false' },
-  { id: 2, image: '/vite.svg', webp: '/vite.svg', name: 'item2', content: 'item2', isClick: 'false' },
-  { id: 3, image: '/vite.svg', webp: '/vite.svg', name: 'item3', content: 'item3', isClick: 'false' },
-  { id: 4, image: '/vite.svg', webp: '/vite.svg', name: 'item4', content: 'item4', isClick: 'false' },
-  { id: 5, image: '/vite.svg', webp: '/vite.svg', name: 'item5', content: 'item5', isClick: 'false' },
-];
 
 function MainApp() {
   const navigate = useNavigate();

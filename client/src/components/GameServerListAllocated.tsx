@@ -1,14 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePodStore } from "../store/podStore";
 // import { usePodWatchSocket } from "../usePodSocket";
+import { GameServerState } from "../common/const";
 
 export default function GameServerListAllocated() {
-  const { allocatedGameServers, fetchAllocatedGameServers, deleteAllocatedGameServer, loading, error } = usePodStore();
+  const { allocatedGameServers, fetchAllGameServers, deleteAllocatedGameServer, loading } = usePodStore();
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const isUnmountedRef = useRef(false);
+  const [now, setNow] = useState(Date.now());
 
-  // 初始加载 Pod 列表
+  const fetchData = async () => {
+    if (isUnmountedRef.current) return;
+    await fetchAllGameServers(GameServerState.ALLOCATED);
+    setNow(Date.now());
+    timeoutRef.current = setTimeout(fetchData, 5000);
+  };
+
   useEffect(() => {
-    fetchAllocatedGameServers();
-  }, [fetchAllocatedGameServers]);
+    isUnmountedRef.current = false;
+    fetchData(); // 初次调用
+    return () => {
+      isUnmountedRef.current = true;
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+        console.log('清除 timeout');
+      }
+    };
+  }, []);
 
   // // 监听 Pod 事件更新
   // usePodWatchSocket((event) => {
@@ -38,38 +56,19 @@ export default function GameServerListAllocated() {
     }
   };
 
-  if (loading && allocatedGameServers && allocatedGameServers.length === 0) {
-    return (
-      <div style={{ padding: '20px', textAlign: 'center' }}>
-        <div>Loading pods...</div>
-      </div>
-    );
-  }
+  function formatDuration(start: string, end?: string): string {
+    const startTime = new Date(start).getTime();
+    const endTime = end ? new Date(end).getTime() : now;
 
-  if (error || !allocatedGameServers) {
-    return (
-      <div style={{ padding: '20px', color: 'red' }}>
-        Error: {error}
-        <button 
-          onClick={() => fetchAllocatedGameServers()} 
-          style={{ marginLeft: '10px', padding: '5px 10px' }}
-        >
-          Retry
-        </button>
-      </div>
-    );
-  } else if (!allocatedGameServers || allocatedGameServers.length === 0) {
-    return (
-      <div style={{ padding: '20px' }}>
-        <h2>No allocated game servers</h2>
-        <button 
-          onClick={() => fetchAllocatedGameServers()} 
-          style={{ marginLeft: '10px', padding: '5px 10px' }}
-        >
-          Refresh
-        </button>
-      </div>
-    );
+    let diff = Math.max(0, endTime - startTime); // 毫秒差
+
+    const totalMinutes = Math.floor(diff / (1000 * 60));
+    const days = Math.floor(totalMinutes / (60 * 24));
+    const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
+    const minutes = totalMinutes % 60;
+
+    const pad = (n: number) => n.toString().padStart(2, '0');
+    return `${pad(days)}天:${pad(hours)}时:${pad(minutes)}分`;
   }
 
   return (
@@ -77,7 +76,7 @@ export default function GameServerListAllocated() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2>Allocated Game Servers ({allocatedGameServers.length})</h2>
         <button 
-          onClick={() => fetchAllocatedGameServers()} 
+          onClick={() => fetchAllGameServers(GameServerState.ALLOCATED)}
           disabled={loading}
           style={{ 
             padding: '8px 16px', 
@@ -128,22 +127,28 @@ export default function GameServerListAllocated() {
                         Port: {gameServer.port}
                       </span>
                     )}
+                    {gameServer.startTime && (
+                      <span style={{ marginLeft: '10px' }}>
+                        Time: {gameServer.startTime ? formatDuration(gameServer.startTime) : 'N/A'}
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div>
                   <button
                     onClick={() => handleRelease(gameServer.name)}
+                    disabled={loading}
                     style={{ 
                       padding: '5px 10px', 
                       backgroundColor: '#dc3545', 
                       color: 'white', 
                       border: 'none', 
                       borderRadius: '4px',
-                      cursor: 'pointer',
+                      cursor: loading ? 'not-allowed' : 'pointer',
                       marginLeft: '10px'
                     }}
                   >
-                    Release
+                    {loading ? 'Terminating...' : 'Terminate'}
                   </button>
                 </div>
               </div>
