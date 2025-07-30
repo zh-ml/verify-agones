@@ -3,7 +3,6 @@ package controller
 import (
 	"klabchina/server/config"
 	"klabchina/server/internal/service"
-	"klabchina/server/internal/ws"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -14,9 +13,9 @@ type PodController struct {
 	svc *service.PodService
 }
 
-func NewPodController(clientset *kubernetes.Clientset, hub *ws.Hub, cfg *config.Config) *PodController {
+func NewPodController(clientset *kubernetes.Clientset, cfg *config.Config) *PodController {
 	return &PodController{
-		svc: service.NewPodService(clientset, hub, cfg),
+		svc: service.NewPodService(clientset, cfg),
 	}
 }
 

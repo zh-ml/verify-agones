@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
 import { usePodStore } from "../store/podStore";
-// import { usePodWatchSocket } from "../usePodSocket";
 import { GameServerState } from "../common/const";
 
 export default function GameServerListAllocated() {
@@ -27,13 +26,6 @@ export default function GameServerListAllocated() {
       }
     };
   }, []);
-
-  // // 监听 Pod 事件更新
-  // usePodWatchSocket((event) => {
-  //   console.log('Pod event received:', event);
-  //   // 当收到 Pod 事件时，重新获取列表
-  //   fetchAllocatedGameServers();
-  // });
 
   const handleRelease = async (name: string) => {
     if (window.confirm(`Are you sure you want to release game server "${name}"?`)) {

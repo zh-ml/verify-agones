@@ -2,29 +2,22 @@ package service
 
 import (
 	"context"
-	"encoding/json"
 	"klabchina/server/config"
-	"klabchina/server/internal/ws"
 	"klabchina/server/pkg/models"
-	"log"
 
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/client-go/informers"
 	"k8s.io/client-go/kubernetes"
-	"k8s.io/client-go/tools/cache"
 )
 
 type PodService struct {
 	clientset *kubernetes.Clientset
-	hub       *ws.Hub
 	namespace string
 }
 
-func NewPodService(clientset *kubernetes.Clientset, hub *ws.Hub, cfg *config.Config) *PodService {
+func NewPodService(clientset *kubernetes.Clientset, cfg *config.Config) *PodService {
 	return &PodService{
 		clientset: clientset,
-		hub:       hub,
 		namespace: cfg.Namespace,
 	}
 }
@@ -98,26 +91,4 @@ func (ps *PodService) ListPod(ctx context.Context) ([]*models.PodInfo, error) {
 
 func (ps *PodService) DeletePod(ctx context.Context, name string) error {
 	return ps.clientset.CoreV1().Pods(ps.namespace).Delete(ctx, name, metav1.DeleteOptions{})
-}
-
-func (ps *PodService) WatchPods(ctx context.Context) {
-	factory := informers.NewSharedInformerFactory(ps.clientset, 0)
-	informer := factory.Core().V1().Pods().Informer()
-
-	informer.AddEventHandler(cache.ResourceEventHandlerFuncs{
-		AddFunc:    ps.handlePodEvent,
-		UpdateFunc: func(oldObj, newObj interface{}) { ps.handlePodEvent(newObj) },
-		DeleteFunc: ps.handlePodEvent,
-	})
-
-	informer.Run(ctx.Done())
-}
-
-func (ps *PodService) handlePodEvent(obj interface{}) {
-	podJson, err := json.Marshal(obj)
-	if err != nil {
-		log.Println("Failed to marshal pod:", err)
-		return
-	}
-	ps.hub.Broadcast <- podJson
 }
